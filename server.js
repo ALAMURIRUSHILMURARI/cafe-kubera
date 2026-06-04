@@ -840,8 +840,10 @@ async function checkReservationTimeouts() {
   }
 }
 
-// Tick check timeouts every 15 seconds
-setInterval(checkReservationTimeouts, 15000);
+// Tick check timeouts every 15 seconds (only when not running in serverless environments like Vercel)
+if (!process.env.VERCEL) {
+  setInterval(checkReservationTimeouts, 15000);
+}
 
 
 // Start server locally, or export for serverless environments (Vercel)
