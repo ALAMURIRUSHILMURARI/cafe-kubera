@@ -38,20 +38,18 @@ const ReservationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 }, { collection: 'kubera-reservations' });
 
-let TableModel, ReservationModel;
+const TableModel = mongoose.model('Table', TableSchema);
+const ReservationModel = mongoose.model('Reservation', ReservationSchema);
 
 if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
       console.log("Connected to MongoDB successfully.");
       isMongoConnected = true;
-      TableModel = mongoose.model('Table', TableSchema);
-      ReservationModel = mongoose.model('Reservation', ReservationSchema);
       initializeMongoTables();
     })
     .catch(err => {
-      console.error("MongoDB connection failed, falling back to local JSON database:", err.message);
-      setupLocalDatabase();
+      console.error("MongoDB connection failed:", err.message);
     });
 } else {
   console.log("No MONGODB_URI provided. Operating on local JSON database.");
@@ -238,7 +236,7 @@ function getRescheduleHTML(res) {
 
 // GET /api/tables
 app.get('/api/tables', async (req, res) => {
-  if (isMongoConnected) {
+  if (process.env.MONGODB_URI) {
     try {
       const tables = await TableModel.find().lean();
       return res.json(tables);
@@ -253,7 +251,7 @@ app.get('/api/tables', async (req, res) => {
 
 // GET /api/reservations
 app.get('/api/reservations', async (req, res) => {
-  if (isMongoConnected) {
+  if (process.env.MONGODB_URI) {
     try {
       const reservations = await ReservationModel.find().lean();
       return res.json(reservations);
@@ -304,7 +302,7 @@ app.post('/api/reservations', async (req, res) => {
     prefix = 'D';
   }
 
-  if (isMongoConnected) {
+  if (process.env.MONGODB_URI) {
     try {
       // Find candidate tables matching capacity prefix
       const candidateTables = await TableModel.find({ id: new RegExp('^' + prefix) });
@@ -496,7 +494,7 @@ app.patch('/api/reservations', async (req, res) => {
     return res.status(400).json({ success: false, error: "Missing ID or Status." });
   }
 
-  if (isMongoConnected) {
+  if (process.env.MONGODB_URI) {
     try {
       const resVal = await ReservationModel.findById(id);
       if (!resVal) return res.status(404).json({ success: false, error: "Reservation not found." });
@@ -641,7 +639,7 @@ app.post('/api/tables/block', async (req, res) => {
   const { table } = req.body;
   if (!table) return res.status(400).json({ success: false, error: "Missing Table ID." });
 
-  if (isMongoConnected) {
+  if (process.env.MONGODB_URI) {
     try {
       const tbl = await TableModel.findOne({ id: table, status: 'available' });
       if (!tbl) return res.status(400).json({ success: false, error: "Table not available for blocking." });
@@ -670,7 +668,7 @@ app.post('/api/tables/release', async (req, res) => {
   const { table } = req.body;
   if (!table) return res.status(400).json({ success: false, error: "Missing Table ID." });
 
-  if (isMongoConnected) {
+  if (process.env.MONGODB_URI) {
     try {
       const tbl = await TableModel.findOne({ id: table });
       if (!tbl) return res.status(404).json({ success: false, error: "Table not found." });
