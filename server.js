@@ -34,7 +34,7 @@ const ReservationSchema = new mongoose.Schema({
   table: String,
   date: String,
   time: String,
-  status: { type: String, enum: ['pending', 'reached', 'no-show', 'left', 'cancelled'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'approved', 'reached', 'no-show', 'left', 'cancelled'], default: 'pending' },
   createdAt: { type: Date, default: Date.now }
 }, { collection: 'kubera-reservations' });
 
