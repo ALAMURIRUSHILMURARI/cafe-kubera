@@ -266,7 +266,8 @@ app.get('/api/reservations', async (req, res) => {
   if (process.env.MONGODB_URI) {
     try {
       const reservations = await ReservationModel.find().lean();
-      return res.json(reservations);
+      const mapped = reservations.map(r => ({ ...r, id: r._id.toString() }));
+      return res.json(mapped);
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -755,7 +756,7 @@ app.post('/api/tables/release', async (req, res) => {
 async function checkReservationTimeouts() {
   const now = new Date();
   
-  if (isMongoConnected) {
+  if (process.env.MONGODB_URI) {
     try {
       // Find all bookings with approved/pending state
       const activeResList = await ReservationModel.find({ status: { $in: ['pending', 'approved'] } });
