@@ -234,6 +234,25 @@ function getRescheduleHTML(res) {
 // 3. REST API ENDPOINTS
 // ==========================================
 
+app.get('/api/test-db', async (req, res) => {
+  try {
+    if (!process.env.MONGODB_URI) {
+      return res.json({ error: "No MONGODB_URI" });
+    }
+    const tables = await TableModel.find().lean();
+    const reservations = await ReservationModel.find().lean();
+    return res.json({
+      isMongoConnected,
+      tablesCount: tables.length,
+      reservationsCount: reservations.length,
+      tables: tables.slice(0, 5),
+      reservations: reservations
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/tables
 app.get('/api/tables', async (req, res) => {
   try {
