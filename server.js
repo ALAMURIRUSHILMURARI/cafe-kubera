@@ -310,9 +310,7 @@ app.post('/api/reservations', async (req, res) => {
   }
 
   // Enforce booking window validation (max 24 hours in advance, at least 1 minute prior)
-  const [year, month, day] = date.split('-');
-  const [hour, min] = time.split(':');
-  const selectedDateTime = new Date(year, month - 1, day, hour, min);
+  const selectedDateTime = new Date(`${date}T${time}:00+05:30`);
   const now = new Date();
   const minAdvanceTime = new Date(now.getTime() + 1 * 60 * 1000);
   const maxAdvanceTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -582,6 +580,7 @@ app.patch('/api/reservations', async (req, res) => {
           } else {
             // Normal check-in
             tbl.status = 'occupied';
+            tbl.currentReservationId = resVal._id.toString();
             await tbl.save();
           }
         } else if (['left', 'cancelled', 'no-show'].includes(status)) {
@@ -650,6 +649,7 @@ app.patch('/api/reservations', async (req, res) => {
         } else {
           // Normal check-in
           tbl.status = 'occupied';
+          tbl.currentReservationId = resVal.id;
         }
       } else if (['left', 'cancelled', 'no-show'].includes(status)) {
         // If table was blocked-walkin, keep it blocked-walkin
@@ -714,9 +714,7 @@ app.post('/api/tables/release', async (req, res) => {
       if (tbl.currentReservationId) {
         const r = await ReservationModel.findById(tbl.currentReservationId);
         if (r && ['approved', 'pending'].includes(r.status)) {
-          const [year, month, day] = r.date.split('-');
-          const [hour, min] = r.time.split(':');
-          const resTime = new Date(year, month - 1, day, hour, min);
+          const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
           const now = new Date();
           if (resTime - now <= 90 * 60 * 1000) {
             shouldBeReserved = true;
@@ -746,9 +744,7 @@ app.post('/api/tables/release', async (req, res) => {
     if (tbl.currentReservationId) {
       const r = data.reservations.find(res => res.id === tbl.currentReservationId);
       if (r && ['approved', 'pending'].includes(r.status)) {
-        const [year, month, day] = r.date.split('-');
-        const [hour, min] = r.time.split(':');
-        const resTime = new Date(year, month - 1, day, hour, min);
+        const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
         const now = new Date();
         if (resTime - now <= 90 * 60 * 1000) {
           shouldBeReserved = true;
@@ -781,11 +777,7 @@ async function checkReservationTimeouts() {
       const activeResList = await ReservationModel.find({ status: { $in: ['pending', 'approved'] } });
       
       for (const res of activeResList) {
-        // Parse time yyyy-MM-dd HH:mm
-        const [year, month, day] = res.date.split('-');
-        const [hour, min] = res.time.split(':');
-        // Construct date locally
-        const resTime = new Date(year, month - 1, day, hour, min);
+        const resTime = new Date(`${res.date}T${res.time}:00+05:30`);
         const expirationTime = new Date(resTime.getTime() + 20 * 60 * 1000);
         
         // 1. Expiration check
@@ -831,9 +823,7 @@ async function checkReservationTimeouts() {
       
       for (const res of data.reservations) {
         if (['pending', 'approved'].includes(res.status)) {
-          const [year, month, day] = res.date.split('-');
-          const [hour, min] = res.time.split(':');
-          const resTime = new Date(year, month - 1, day, hour, min);
+          const resTime = new Date(`${res.date}T${res.time}:00+05:30`);
           const expirationTime = new Date(resTime.getTime() + 20 * 60 * 1000);
           
           // 1. Expiration check
