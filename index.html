@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cafe Kubera | Premium Specialty Coffee & Heritage Lounge | Vijayawada</title>
+  <meta name="description" content="Experience the gold standard of coffee in Vijayawada. Cafe Kubera blends premium artisan roasts with rich Indian heritage, offering a dark-luxury coffee lounge experience.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Liquid Morphing Background Canvas -->
+  <canvas id="liquid-bg"></canvas>
+
+
+
+  <!-- Header & Navigation -->
+  <header>
+    <div class="header-container">
+      <a href="#" class="logo" id="header-logo">
+        <span class="gold-text">KUBERA</span>
+        <span class="separator">|</span>
+        <span class="sub-logo">CAFE</span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="#about" class="nav-link">The Legend</a></li>
+          <li><a href="#menu" class="nav-link">Gourmet Ledger</a></li>
+          <li><a href="#brew-simulator" class="nav-link">Brew Studio</a></li>
+          <li><a href="#gallery" class="nav-link">Treasures</a></li>
+          <li><a href="#booking" class="nav-link">Reserve Table</a></li>
+        </ul>
+      </nav>
+      <a href="#booking" class="btn-primary header-cta">Book Lounge</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero">
+    <div class="hero-content">
+      <span class="hero-subtitle">BREWING PROSPERITY & HERITAGE</span>
+      <h1 class="hero-title">The Gold Standard of <br><span class="serif-italic gold-text">Specialty Coffee</span></h1>
+      <p class="hero-desc">Indulge in a dark-luxury coffee lounge in the heart of Vijayawada. Where ancient Indian heritage meets the precision of modern extraction.</p>
+      <div class="hero-buttons">
+        <a href="#menu" class="btn-primary">Explore Ledger</a>
+        <a href="#brew-simulator" class="btn-secondary">Simulate Extraction</a>
+      </div>
+    </div>
+    <div class="hero-image-container">
+      <div class="hero-badge">
+        <span class="badge-title">VIJAYAWADA</span>
+        <span class="badge-sub">Est. 2026</span>
+      </div>
+      <div class="hero-visual-card">
+        <!-- Will be styled with a rich gradient background and gold elements -->
+        <div class="visual-gradient-overlay"></div>
+        <div class="floating-coffee-cup">☕</div>
+        <div class="visual-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / Heritage Section -->
+  <section class="about-section" id="about">
+    <div class="section-container">
+      <div class="about-grid">
+        <div class="about-text-content">
+          <span class="section-tag">THE LEGEND</span>
+          <h2 class="section-title">Where Wealth Meets <br><span class="serif-italic gold-text">Warmth & Artistry</span></h2>
+          <p class="section-desc">Inspired by the lord of treasures, Cafe Kubera is envisioned as a sanctuary of opulence and comfort. Just as Lord Kubera guards the world's wealth, we guard the integrity of every coffee bean we source.</p>
+          <div class="heritage-highlights">
+            <div class="highlight-item">
+              <span class="highlight-num">85+</span>
+              <span class="highlight-label">Cupping Score Specialty Beans</span>
+            </div>
+            <div class="highlight-item">
+              <span class="highlight-num">100%</span>
+              <span class="highlight-label">Sustainably Sourced from Western Ghats</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual-content">
+          <div class="glass-card about-glass-card">
+            <h3>Our Coffee Philosophy</h3>
+            <p>We source single-origin micro-lots from Chikmagalur and Araku Valley, roasting them to perfection to highlight distinct regional notes: from the cardamom-tinted soil spice to the heavy chocolate finish.</p>
+            <div class="philosophy-quote">
+              "A cup of coffee at Cafe Kubera is not just a beverage; it is a sip of liquid gold."
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Double-Page Flipbook Menu -->
+  <section class="menu-section" id="menu">
+    <div class="section-header">
+      <span class="section-tag">THE LEDGER</span>
+      <h2 class="section-title">Signature Menu & <br><span class="serif-italic gold-text">Artisan Brews</span></h2>
+      <p class="section-subtitle">Turn the pages of our leather-bound ledger to explore culinary treasures.</p>
+    </div>
+
+    <div class="menu-flipbook-container">
+      <!-- Flipbook Widget -->
+      <div class="flipbook" id="menu-flipbook">
+        
+        <!-- Spiral Spine -->
+        <div class="spiral-spine">
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+        </div>
+
+        <!-- Page 1 & 2: Cover & Introduction -->
+        <div class="flipbook-page cover-page active" id="page-1">
+          <div class="page-content cover-content">
+            <div class="page-header">
+              <span class="page-num">I</span>
+            </div>
+            <div class="cover-design">
+              <div class="cover-gold-seal">K</div>
+              <h3 class="cover-title">KUBERA</h3>
+              <p class="cover-subtitle">THE GOURMET LEDGER</p>
+              <div class="cover-divider"></div>
+              <p class="cover-date">Vijayawada Edition</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page 3 & 4: Specialty Brews -->
+        <div class="flipbook-page menu-page" id="page-2">
+          <div class="page-content">
+            <div class="page-header">
+              <span class="page-category">GOLDEN ESSENCE</span>
+              <span class="page-num">II</span>
+            </div>
+            <h3 class="menu-page-title">Specialty Brews</h3>
+            
+            <div class="menu-items-list">
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Saffron Gold Latte</span>
+                  <span class="menu-item-desc">Espresso infused with real saffron threads, topped with gold dust.</span>
+                </div>
+                <span class="menu-item-price">₹340</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Araku Pour-Over</span>
+                  <span class="menu-item-desc">Light-roasted single origin, showcasing berry acidity and jasmine aroma.</span>
+                </div>
+                <span class="menu-item-price">₹280</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Rose Gold Aeropress</span>
+                  <span class="menu-item-desc">Bright extraction layered with hand-pressed organic rose water syrup.</span>
+                </div>
+                <span class="menu-item-price">₹290</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Kubera Golden Affogato</span>
+                  <span class="menu-item-desc">Double espresso pulled over premium saffron pistachio gelato.</span>
+                </div>
+                <span class="menu-item-price">₹320</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page 5 & 6: Velvet Tonics & Cold Elixirs -->
+        <div class="flipbook-page menu-page" id="page-3">
+          <div class="page-content">
+            <div class="page-header">
+              <span class="page-category">COLD ELIXIRS</span>
+              <span class="page-num">III</span>
+            </div>
+            <h3 class="menu-page-title">Velvet Tonics</h3>
+            
+            <div class="menu-items-list">
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Crimson Cold Brew</span>
+                  <span class="menu-item-desc">18-hour cold brew layered with hibiscus infusion and fresh lime peel.</span>
+                </div>
+                <span class="menu-item-price">₹310</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Cardamom Shakerato</span>
+                  <span class="menu-item-desc">Espresso shaken with ice, dark jaggery, and crushed cardamom.</span>
+                </div>
+                <span class="menu-item-price">₹270</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Charcoal Smoked Mocha</span>
+                  <span class="menu-item-desc">Activated charcoal chocolate blend, smoked with applewood dust.</span>
+                </div>
+                <span class="menu-item-price">₹330</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Pandan Cream Cold Foam</span>
+                  <span class="menu-item-desc">Smooth cold brew topped with aerated pandan-coconut sweet cream.</span>
+                </div>
+                <span class="menu-item-price">₹300</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page 7 & 8: Gourmet Ledger (Eats) -->
+        <div class="flipbook-page menu-page" id="page-4">
+          <div class="page-content">
+            <div class="page-header">
+              <span class="page-category">SACRED SWEETS</span>
+              <span class="page-num">IV</span>
+            </div>
+            <h3 class="menu-page-title">Gourmet Pairings</h3>
+            
+            <div class="menu-items-list">
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Pootharekulu Macaron</span>
+                  <span class="menu-item-desc">French macaron shells filled with jaggery butter and rice-paper crispy dust.</span>
+                </div>
+                <span class="menu-item-price">₹220</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Guntur Chili Cacao Tart</span>
+                  <span class="menu-item-desc">Dark chocolate ganache spiced with a trace of Guntur red pepper.</span>
+                </div>
+                <span class="menu-item-price">₹260</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Cardamom Pistachio Croissant</span>
+                  <span class="menu-item-desc">Flaky twice-baked butter croissant loaded with cardamom frangipane.</span>
+                </div>
+                <span class="menu-item-price">₹240</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-info">
+                  <span class="menu-item-name">Jackfruit Crema Danish</span>
+                  <span class="menu-item-desc">Puff pastry ring filled with caramelized jackfruit custard and mint sprig.</span>
+                </div>
+                <span class="menu-item-price">₹250</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Navigation Arrows -->
+      <div class="flipbook-nav">
+        <button class="flipbook-btn prev-btn" id="flip-prev">⬅ Previous</button>
+        <div class="flipbook-pagination"><span id="current-spread">1</span> / 2</div>
+        <button class="flipbook-btn next-btn" id="flip-next">Next ➔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Espresso Extraction Chamber (Brew Studio) -->
+  <section class="brew-simulator-section" id="brew-simulator">
+    <div class="section-container">
+      <div class="simulator-grid">
+        <div class="simulator-canvas-container">
+          <span class="canvas-instruction">DRAG PLUNGER DOWN TO PRESS & EXTRACT PURE COFFEE</span>
+          <!-- Interactive French Press Coffee Brewer Canvas -->
+          <canvas id="coffee-press-canvas"></canvas>
+        </div>
+        <div class="simulator-controls">
+          <span class="section-tag">BREW STUDIO</span>
+          <h2 class="section-title">The Alchemy <br>of the Press</h2>
+          <p class="section-desc">Interact with our virtual French Press brewer. Drag your mouse or touch vertically to press the filter plunger down. Watch the coffee grinds compress at the bottom as a rich, filtered golden brew fills the upper chamber.</p>
+          
+          <!-- Glaze Selector (equivalent to Roasts/Flavor notes) -->
+          <div class="glaze-selector-title">Select Roast Blend Profile:</div>
+          <div class="glaze-buttons-container">
+            <button class="glaze-btn active" data-roast="crema" style="--btn-color: #D4AF37;">
+              <span class="glaze-color-dot" style="background-color: #D4AF37;"></span>
+              Golden Crema
+            </button>
+            <button class="glaze-btn" data-roast="velvet" style="--btn-color: #800C12;">
+              <span class="glaze-color-dot" style="background-color: #800C12;"></span>
+              Crimson Velvet
+            </button>
+            <button class="glaze-btn" data-roast="mist" style="--btn-color: #097969;">
+              <span class="glaze-color-dot" style="background-color: #097969;"></span>
+              Emerald Mist
+            </button>
+            <button class="glaze-btn" data-roast="mocha" style="--btn-color: #8B4513;">
+              <span class="glaze-color-dot" style="background-color: #8B4513;"></span>
+              Royal Mocha
+            </button>
+            <button class="glaze-btn" data-roast="dark" style="--btn-color: #2F2F2F;">
+              <span class="glaze-color-dot" style="background-color: #2F2F2F;"></span>
+              Midnight Dark
+            </button>
+          </div>
+
+          <div class="simulation-metrics glass-card">
+            <div class="metric-row">
+              <span>Plunger Depth:</span>
+              <span id="metric-pressure">0%</span>
+            </div>
+            <div class="metric-row">
+              <span>Press Stage:</span>
+              <span id="metric-stage" class="gold-text">Grounds Steeping</span>
+            </div>
+            <div class="metric-row">
+              <span>Roast Color (RGB LERP):</span>
+              <span id="metric-color">rgb(212, 175, 55)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3D Parallax Glare Cards & Lightbox Modals -->
+  <section class="gallery-section" id="gallery">
+    <div class="section-header">
+      <span class="section-tag">TREASURES</span>
+      <h2 class="section-title">Visual Treasures of <br><span class="serif-italic gold-text">Kubera Lounge</span></h2>
+      <p class="section-subtitle">Hover over the cards to experience interactive parallax lighting. Click to open full details.</p>
+    </div>
+
+    <div class="gallery-grid-container">
+      <div class="gallery-grid">
+        
+        <!-- Card 1 -->
+        <div class="parallax-card" data-gallery-id="1">
+          <div class="card-inner">
+            <div class="card-image-fallback" style="background: linear-gradient(135deg, #16130F, #3D3528);">
+              <div class="card-symbol">☕</div>
+            </div>
+            <div class="card-sheen"></div>
+            <div class="card-info">
+              <span class="card-tag">Artisan Espresso</span>
+              <h4 class="card-name">Saffron Gold Latte</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="parallax-card" data-gallery-id="2">
+          <div class="card-inner">
+            <div class="card-image-fallback" style="background: linear-gradient(135deg, #1C0A0C, #4D1217);">
+              <div class="card-symbol">🍷</div>
+            </div>
+            <div class="card-sheen"></div>
+            <div class="card-info">
+              <span class="card-tag">Signature Tonic</span>
+              <h4 class="card-name">Crimson Cold Brew</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="parallax-card" data-gallery-id="3">
+          <div class="card-inner">
+            <div class="card-image-fallback" style="background: linear-gradient(135deg, #0C1E18, #184A3B);">
+              <div class="card-symbol">🥐</div>
+            </div>
+            <div class="card-sheen"></div>
+            <div class="card-info">
+              <span class="card-tag">Artisan Pastry</span>
+              <h4 class="card-name">Cardamom Croissant</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="parallax-card" data-gallery-id="4">
+          <div class="card-inner">
+            <div class="card-image-fallback" style="background: linear-gradient(135deg, #090909, #25221F);">
+              <div class="card-symbol">🏺</div>
+            </div>
+            <div class="card-sheen"></div>
+            <div class="card-info">
+              <span class="card-tag">Luxury Spaces</span>
+              <h4 class="card-name">The Kubera Lounge</h4>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Section with Custom Calendar Widget -->
+  <section class="booking-section" id="booking">
+    <div class="section-container">
+      <div class="booking-grid">
+        <div class="booking-text">
+          <span class="section-tag">RESERVATIONS</span>
+          <h2 class="section-title">Acquire Your Table at <br><span class="serif-italic gold-text">The Kubera Lounge</span></h2>
+          <p class="section-desc">Reserve your space in our luxury heritage lounge. Ideal for business discussions, leisurely afternoons, or coffee tasting sessions. Select your date and time to secure your slot.</p>
+          <div class="booking-notes glass-card">
+            <h4>Reservations Guidelines</h4>
+            <ul>
+              <li>Reservations are held for a maximum of 15 minutes.</li>
+              <li>Please notify us of any allergy constraints in the special notes.</li>
+              <li>The Kubera tasting lounge runs exclusive sessions every Friday evening.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="booking-form-container glass-card">
+          <form id="reservation-form">
+            <div class="form-group">
+              <label for="booking-name">Full Name</label>
+              <input type="text" id="booking-name" required placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+              <label for="booking-email">Email Address</label>
+              <input type="email" id="booking-email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+              <label for="booking-phone">Phone Number</label>
+              <input type="text" id="booking-phone" required placeholder="Enter your phone number">
+            </div>
+            <div class="form-group">
+              <label for="booking-guests">Number of Guests (Max 8)</label>
+              <input type="number" id="booking-guests" required min="1" max="8" value="2" style="width: 100%; background: rgba(250, 246, 240, 0.02); border: 1px solid rgba(250, 246, 240, 0.1); color: var(--text-cream); padding: 14px; border-radius: 4px; font-family: var(--font-ui); font-size: 14px; transition: var(--transition-smooth); outline: none;">
+            </div>
+
+
+            <!-- Custom Calendar Widget -->
+            <div class="form-group">
+              <label>Select Date</label>
+              <div class="custom-calendar-widget" id="custom-calendar">
+                <div class="calendar-header">
+                  <button type="button" class="calendar-nav" id="cal-prev">◀</button>
+                  <span id="calendar-month-year">June 2026</span>
+                  <button type="button" class="calendar-nav" id="cal-next">▶</button>
+                </div>
+                <div class="calendar-weekdays">
+                  <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                </div>
+                <div class="calendar-cells" id="calendar-days">
+                  <!-- Cells generated dynamically -->
+                </div>
+              </div>
+              <input type="hidden" id="selected-date" required>
+            </div>
+
+            <!-- Time Slots -->
+            <div class="form-group">
+              <label>Available Time Slots</label>
+              <div class="time-slots-container" id="time-slots" style="max-height: 200px; overflow-y: auto; padding-right: 5px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
+                <!-- Generated dynamically every 30 mins -->
+              </div>
+              <input type="hidden" id="selected-time" required>
+            </div>
+
+            <button type="submit" class="btn-primary form-submit-btn">Request Reservation</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox-modal" id="lightbox-modal">
+    <div class="lightbox-close" id="lightbox-close">×</div>
+    <div class="lightbox-content">
+      <div class="lightbox-image-container">
+        <!-- We use beautiful styled panels for detailed items -->
+        <div class="lightbox-details-panel">
+          <div class="lightbox-symbol" id="modal-symbol">☕</div>
+          <span class="lightbox-tag" id="modal-tag">Artisan Espresso</span>
+          <h3 class="lightbox-title" id="modal-title">Saffron Gold Latte</h3>
+          <p class="lightbox-desc" id="modal-desc">Made with premium Araku Valley beans, infused with authentic Kashmiri saffron threads, and topped with delicate, edible 24k gold dust. A true celebration of wealth and taste.</p>
+          <div class="lightbox-metadata">
+            <span class="metadata-label" id="modal-metadata-label">Roast Profile</span>
+            <span class="metadata-val" id="modal-metadata-val">Light-Medium (Spice Notes)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Toast Message -->
+  <div id="booking-toast">
+    <span class="toast-icon">✨</span>
+    <span class="toast-message">Reservation Requested Successfully!</span>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-logo">
+        <span class="gold-text">KUBERA</span>
+      </div>
+      <p class="footer-tagline">Vijayawada's Premium Specialty Coffee Sanctuary</p>
+      <div class="footer-links">
+        <p>12-4-99, High Street, Benz Circle, Vijayawada, AP</p>
+        <p>Hours: 9:00 AM - 11:00 PM daily</p>
+        <p style="margin-top: 15px;">
+          <a href="admin.html" class="btn-secondary" style="font-size: 11px; padding: 8px 16px; border-color: rgba(212, 175, 55, 0.4); color: var(--accent-gold);">Admin Portal</a>
+        </p>
+      </div>
+      <p class="copyright">&copy; 2026 Cafe Kubera. Designed for luxury.</p>
+    </div>
+  </footer>
+
+  <!-- Main JS file -->
+  <script src="js/main.js"></script>
+</body>
+</html>

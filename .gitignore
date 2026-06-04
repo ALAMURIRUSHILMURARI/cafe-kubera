@@ -1,0 +1,7 @@
+node_modules/
+.env
+database.json
+scratch/
+test_booking.js
+test_endpoints.js
+.system_generated/
