@@ -381,9 +381,11 @@ app.post('/api/reservations', async (req, res) => {
         }
       }
       
-      // Dispatch Notices
-      await sendMailSafe(process.env.ADMIN_EMAIL || 'admin@cafekubera.com', "New Booking Alert", getAdminNoticeHTML(newRes));
-      await sendMailSafe(newRes.email, "Reservation Approved", getArrivalHTML(newRes));
+      // Dispatch Notices in parallel to minimize response lag
+      await Promise.all([
+        sendMailSafe(process.env.ADMIN_EMAIL || 'admin@cafekubera.com', "New Booking Alert", getAdminNoticeHTML(newRes)),
+        sendMailSafe(newRes.email, "Reservation Approved", getArrivalHTML(newRes))
+      ]).catch(err => console.error("Error sending booking notification emails:", err));
       
       return res.status(201).json({ success: true, reservationId: newRes._id, table: assignedTable.id });
     } catch (err) {
@@ -476,9 +478,11 @@ app.post('/api/reservations', async (req, res) => {
       data.reservations.push(newRes);
       saveLocalData(data);
       
-      // Dispatch Notices
-      await sendMailSafe(process.env.ADMIN_EMAIL || 'admin@cafekubera.com', "New Booking Alert", getAdminNoticeHTML(newRes));
-      await sendMailSafe(newRes.email, "Reservation Approved", getArrivalHTML(newRes));
+      // Dispatch Notices in parallel to minimize response lag
+      await Promise.all([
+        sendMailSafe(process.env.ADMIN_EMAIL || 'admin@cafekubera.com', "New Booking Alert", getAdminNoticeHTML(newRes)),
+        sendMailSafe(newRes.email, "Reservation Approved", getArrivalHTML(newRes))
+      ]).catch(err => console.error("Error sending booking notification emails:", err));
       
       return res.status(201).json({ success: true, reservationId: newId, table: assignedTable.id });
     } catch (err) {
