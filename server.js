@@ -236,6 +236,12 @@ function getRescheduleHTML(res) {
 
 // GET /api/tables
 app.get('/api/tables', async (req, res) => {
+  try {
+    await checkReservationTimeouts();
+  } catch (err) {
+    console.error("Timeout checking failed during GET /api/tables:", err);
+  }
+
   if (process.env.MONGODB_URI) {
     try {
       const tables = await TableModel.find().lean();
@@ -251,6 +257,12 @@ app.get('/api/tables', async (req, res) => {
 
 // GET /api/reservations
 app.get('/api/reservations', async (req, res) => {
+  try {
+    await checkReservationTimeouts();
+  } catch (err) {
+    console.error("Timeout checking failed during GET /api/reservations:", err);
+  }
+
   if (process.env.MONGODB_URI) {
     try {
       const reservations = await ReservationModel.find().lean();
