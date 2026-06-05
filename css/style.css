@@ -327,6 +327,11 @@ nav ul {
   color: var(--text-sand);
   position: relative;
   padding: 8px 0;
+  white-space: nowrap;
+}
+
+.header-cta {
+  white-space: nowrap;
 }
 
 .nav-link::after {
@@ -1612,7 +1617,22 @@ footer {
    RESPONSIVENESS AND MOBILE ADAPTATION
    ========================================================================== */
 
+@media (max-width: 1200px) {
+  nav ul {
+    gap: 20px;
+  }
+}
+
 @media (max-width: 1024px) {
+  nav ul {
+    gap: 12px;
+  }
+  .header-container {
+    padding: 0 16px;
+  }
+  .header-cta {
+    padding: 12px 20px;
+  }
   .hero-title {
     font-size: 44px;
   }
@@ -1625,6 +1645,20 @@ footer {
   }
   .booking-text {
     position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  nav ul {
+    gap: 8px;
+  }
+  .logo {
+    font-size: 19px;
+    letter-spacing: 2px;
+  }
+  .logo .sub-logo {
+    font-size: 13px;
+    letter-spacing: 3px;
   }
 }
 
