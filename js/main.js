@@ -779,8 +779,8 @@ document.addEventListener('DOMContentLoaded', () => {
     timeSlotsContainer.innerHTML = '';
     
     // Operating hours: 9:00 AM to 11:00 PM
-    // Slots span 9:00 AM to 10:30 PM (varying every 30 mins)
-    for (let hour = 9.0; hour <= 22.5; hour += 0.5) {
+    // Slots span 9:00 AM to 10:00 PM (varying every 30 mins)
+    for (let hour = 9.0; hour <= 22.0; hour += 0.5) {
       const h = Math.floor(hour);
       const m = (hour % 1 === 0) ? '00' : '30';
       

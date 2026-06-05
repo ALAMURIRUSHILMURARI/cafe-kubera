@@ -113,10 +113,11 @@ function getMinutesFromTime(timeStr) {
   return h * 60 + m;
 }
 
-function hasOverlap(timeStr1, timeStr2) {
+function hasOverlap(timeStr1, timeStr2, prefix) {
   const m1 = getMinutesFromTime(timeStr1);
   const m2 = getMinutesFromTime(timeStr2);
-  return Math.abs(m1 - m2) < 90;
+  const spacing = (prefix === 'C' || prefix === 'D') ? 120 : 90;
+  return Math.abs(m1 - m2) < spacing;
 }
 
 
@@ -325,6 +326,12 @@ app.post('/api/reservations', async (req, res) => {
   const now = new Date();
   const minAdvanceTime = new Date(now.getTime() + 1 * 60 * 1000);
   const maxAdvanceTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+  // Operating Hours Booking Guard (No bookings after 10:00 PM IST)
+  const bookingMinutes = getMinutesFromTime(time);
+  if (bookingMinutes > 22 * 60) {
+    return res.status(400).json({ success: false, error: "Reservations are not allowed after 10:00 PM (1 hour prior to closing)." });
+  }
   
   if (selectedDateTime < minAdvanceTime) {
     return res.status(400).json({ success: false, error: "Reservations must be made at least 1 minute in advance." });
@@ -832,6 +839,45 @@ async function checkReservationTimeouts() {
           }
         }
       }
+
+      // 3. Auto-release blocked-walkin tables after 90 minutes or at closing time (11:00 PM IST)
+      const blockedTables = await TableModel.find({ status: 'blocked-walkin' });
+      const istHour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }), 10);
+      
+      for (const tbl of blockedTables) {
+        let shouldRelease = false;
+        if (tbl.blockedAt) {
+          const elapsedMins = (now - new Date(tbl.blockedAt)) / (1000 * 60);
+          if (elapsedMins >= 90) shouldRelease = true;
+        }
+        if (istHour >= 23 || istHour < 9) shouldRelease = true;
+        
+        if (shouldRelease) {
+          console.log(`Auto-releasing walk-in block on Table ${tbl.id}`);
+          const activeRes = await ReservationModel.find({
+            table: tbl.id,
+            status: { $in: ['approved', 'pending'] }
+          });
+          let nextRes = null;
+          for (const r of activeRes) {
+            const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
+            const diffMs = resTime - now;
+            if (diffMs <= 90 * 60 * 1000 && diffMs >= -20 * 60 * 1000) {
+              nextRes = r;
+              break;
+            }
+          }
+          if (nextRes) {
+            tbl.status = 'reserved';
+            tbl.currentReservationId = nextRes._id.toString();
+          } else {
+            tbl.status = 'available';
+            tbl.currentReservationId = null;
+          }
+          tbl.blockedAt = null;
+          await tbl.save();
+        }
+      }
     } catch (err) {
       console.error("Error checking timeouts on MongoDB:", err);
     }
@@ -877,6 +923,45 @@ async function checkReservationTimeouts() {
           }
         }
       }
+
+      // Auto-release blocked-walkin tables after 90 minutes or at closing time (11:00 PM IST)
+      const istHour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }), 10);
+      for (const tbl of data.tables) {
+        if (tbl.status === 'blocked-walkin') {
+          let shouldRelease = false;
+          if (tbl.blockedAt) {
+            const elapsedMins = (now - new Date(tbl.blockedAt)) / (1000 * 60);
+            if (elapsedMins >= 90) shouldRelease = true;
+          }
+          if (istHour >= 23 || istHour < 9) shouldRelease = true;
+          
+          if (shouldRelease) {
+            console.log(`Auto-releasing local walk-in block on Table ${tbl.id}`);
+            const activeRes = data.reservations.filter(r => 
+              r.table === tbl.id && ['approved', 'pending'].includes(r.status)
+            );
+            let nextRes = null;
+            for (const r of activeRes) {
+              const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
+              const diffMs = resTime - now;
+              if (diffMs <= 90 * 60 * 1000 && diffMs >= -20 * 60 * 1000) {
+                nextRes = r;
+                break;
+              }
+            }
+            if (nextRes) {
+              tbl.status = 'reserved';
+              tbl.currentReservationId = nextRes.id;
+            } else {
+              tbl.status = 'available';
+              tbl.currentReservationId = null;
+            }
+            tbl.blockedAt = null;
+            changed = true;
+          }
+        }
+      }
+
       if (changed) saveLocalData(data);
     } catch (err) {
       console.error("Error checking timeouts on JSON db:", err);
