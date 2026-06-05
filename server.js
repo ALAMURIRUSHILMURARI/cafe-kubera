@@ -585,9 +585,10 @@ app.patch('/api/reservations', async (req, res) => {
           if (tbl.status === 'blocked-walkin' || isOccupiedByOther) {
             const originalPrefix = resVal.table[0];
             let upgradePrefixes = [];
-            if (originalPrefix === 'A') upgradePrefixes = ['B', 'C', 'D'];
-            else if (originalPrefix === 'B') upgradePrefixes = ['C', 'D'];
-            else if (originalPrefix === 'C') upgradePrefixes = ['D'];
+            if (originalPrefix === 'A') upgradePrefixes = ['A', 'B', 'C', 'D'];
+            else if (originalPrefix === 'B') upgradePrefixes = ['B', 'C', 'D'];
+            else if (originalPrefix === 'C') upgradePrefixes = ['C', 'D'];
+            else if (originalPrefix === 'D') upgradePrefixes = ['D'];
 
             let upgradedTable = null;
             for (const prefix of upgradePrefixes) {
@@ -674,9 +675,10 @@ app.patch('/api/reservations', async (req, res) => {
         if (tbl.status === 'blocked-walkin' || isOccupiedByOther) {
           const originalPrefix = resVal.table[0];
           let upgradePrefixes = [];
-          if (originalPrefix === 'A') upgradePrefixes = ['B', 'C', 'D'];
-          else if (originalPrefix === 'B') upgradePrefixes = ['C', 'D'];
-          else if (originalPrefix === 'C') upgradePrefixes = ['D'];
+          if (originalPrefix === 'A') upgradePrefixes = ['A', 'B', 'C', 'D'];
+          else if (originalPrefix === 'B') upgradePrefixes = ['B', 'C', 'D'];
+          else if (originalPrefix === 'C') upgradePrefixes = ['C', 'D'];
+          else if (originalPrefix === 'D') upgradePrefixes = ['D'];
 
           let upgradedTable = null;
           for (const prefix of upgradePrefixes) {
