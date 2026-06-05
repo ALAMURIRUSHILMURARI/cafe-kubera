@@ -280,6 +280,23 @@ app.post('/api/admin/login', (req, res) => {
   return res.status(401).json({ success: false, error: 'Invalid username or password.' });
 });
 
+app.get('/api/diag-env', (req, res) => {
+  const keys = Object.keys(process.env);
+  const info = {};
+  keys.forEach(k => {
+    if (k.includes('ADMIN') || k.includes('PASS') || k.includes('USER') || k.includes('URI')) {
+      const val = process.env[k];
+      info[k] = {
+        exists: !!val,
+        length: val ? val.length : 0,
+        firstChar: val ? val[0] : null,
+        lastChar: val ? val[val.length - 1] : null
+      };
+    }
+  });
+  return res.json(info);
+});
+
 app.get('/api/test-db', requireAdmin, async (req, res) => {
   try {
     if (!process.env.MONGODB_URI) {
