@@ -108,6 +108,17 @@ function saveLocalData(data) {
   fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 }
 
+function getMinutesFromTime(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function hasOverlap(timeStr1, timeStr2) {
+  const m1 = getMinutesFromTime(timeStr1);
+  const m2 = getMinutesFromTime(timeStr2);
+  return Math.abs(m1 - m2) < 90;
+}
+
 
 // ==========================================
 // 2. SMTP EMAIL NOTIFICATION SERVICE
@@ -339,13 +350,13 @@ app.post('/api/reservations', async (req, res) => {
       
       let assignedTable = null;
       for (const tbl of candidateTables) {
-        // Check if there is an active reservation conflict for this table at this date and time
-        const conflict = await ReservationModel.findOne({
+        // Find active reservations for this table on this date to verify overlap
+        const activeReservations = await ReservationModel.find({
           table: tbl.id,
           date: date,
-          time: time,
           status: { $in: ['approved', 'pending', 'reached'] }
         });
+        const conflict = activeReservations.find(r => hasOverlap(r.time, time));
         
         if (!conflict) {
           // If booking date is today, check if table is currently available live
@@ -364,12 +375,12 @@ app.post('/api/reservations', async (req, res) => {
         const blockedTables = [];
         for (const tbl of candidateTables) {
           if (tbl.status === 'blocked-walkin') {
-            const conflict = await ReservationModel.findOne({
+            const activeReservations = await ReservationModel.find({
               table: tbl.id,
               date: date,
-              time: time,
               status: { $in: ['approved', 'pending', 'reached'] }
             });
+            const conflict = activeReservations.find(r => hasOverlap(r.time, time));
             if (!conflict) {
               blockedTables.push(tbl);
             }
@@ -429,12 +440,12 @@ app.post('/api/reservations', async (req, res) => {
       
       let assignedTable = null;
       for (const tbl of candidateTables) {
-        // Check if there is an active reservation conflict in local array
+        // Check if there is an active reservation conflict in local array (within 90 mins spacing)
         const conflict = data.reservations.find(r => 
           r.table === tbl.id &&
           r.date === date &&
-          r.time === time &&
-          ['approved', 'pending', 'reached'].includes(r.status)
+          ['approved', 'pending', 'reached'].includes(r.status) &&
+          hasOverlap(r.time, time)
         );
         
         if (!conflict) {
@@ -457,8 +468,8 @@ app.post('/api/reservations', async (req, res) => {
             const conflict = data.reservations.find(r => 
               r.table === tbl.id &&
               r.date === date &&
-              r.time === time &&
-              ['approved', 'pending', 'reached'].includes(r.status)
+              ['approved', 'pending', 'reached'].includes(r.status) &&
+              hasOverlap(r.time, time)
             );
             if (!conflict) {
               blockedTables.push(tbl);
@@ -709,21 +720,26 @@ app.post('/api/tables/release', async (req, res) => {
       const tbl = await TableModel.findOne({ id: table });
       if (!tbl) return res.status(404).json({ success: false, error: "Table not found." });
       
-      // If table has a reservation waiting, only lock if it starts in 90 mins or less
-      let shouldBeReserved = false;
-      if (tbl.currentReservationId) {
-        const r = await ReservationModel.findById(tbl.currentReservationId);
-        if (r && ['approved', 'pending'].includes(r.status)) {
-          const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
-          const now = new Date();
-          if (resTime - now <= 90 * 60 * 1000) {
-            shouldBeReserved = true;
-          }
+      // Find any upcoming active reservation for this table starting in 90 mins or less
+      const activeReservations = await ReservationModel.find({
+        table: table,
+        status: { $in: ['approved', 'pending'] }
+      });
+      
+      let nextRes = null;
+      const now = new Date();
+      for (const r of activeReservations) {
+        const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
+        const diffMs = resTime - now;
+        if (diffMs <= 90 * 60 * 1000 && diffMs >= -20 * 60 * 1000) {
+          nextRes = r;
+          break;
         }
       }
 
-      if (shouldBeReserved) {
+      if (nextRes) {
         tbl.status = 'reserved';
+        tbl.currentReservationId = nextRes._id.toString();
       } else {
         tbl.status = 'available';
         tbl.currentReservationId = null;
@@ -739,21 +755,25 @@ app.post('/api/tables/release', async (req, res) => {
     const tbl = data.tables.find(t => t.id === table);
     if (!tbl) return res.status(404).json({ success: false, error: "Table not found." });
     
-    // If table has a reservation waiting, only lock if it starts in 90 mins or less
-    let shouldBeReserved = false;
-    if (tbl.currentReservationId) {
-      const r = data.reservations.find(res => res.id === tbl.currentReservationId);
-      if (r && ['approved', 'pending'].includes(r.status)) {
-        const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
-        const now = new Date();
-        if (resTime - now <= 90 * 60 * 1000) {
-          shouldBeReserved = true;
-        }
+    const now = new Date();
+    let nextRes = null;
+    
+    const activeReservations = data.reservations.filter(r => 
+      r.table === table && ['approved', 'pending'].includes(r.status)
+    );
+    
+    for (const r of activeReservations) {
+      const resTime = new Date(`${r.date}T${r.time}:00+05:30`);
+      const diffMs = resTime - now;
+      if (diffMs <= 90 * 60 * 1000 && diffMs >= -20 * 60 * 1000) {
+        nextRes = r;
+        break;
       }
     }
 
-    if (shouldBeReserved) {
+    if (nextRes) {
       tbl.status = 'reserved';
+      tbl.currentReservationId = nextRes.id;
     } else {
       tbl.status = 'available';
       tbl.currentReservationId = null;
