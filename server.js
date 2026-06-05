@@ -366,16 +366,17 @@ app.post('/api/reservations', async (req, res) => {
 
       // Find candidate tables matching capacity prefix
       const candidateTables = await TableModel.find({ id: new RegExp('^' + prefix) });
+
+      // Fetch all active reservations for this date in a single query to optimize performance
+      const activeReservationsForDate = await ReservationModel.find({
+        date: date,
+        status: { $in: ['approved', 'pending', 'reached'] }
+      });
       
       let assignedTable = null;
       for (const tbl of candidateTables) {
-        // Find active reservations for this table on this date to verify overlap
-        const activeReservations = await ReservationModel.find({
-          table: tbl.id,
-          date: date,
-          status: { $in: ['approved', 'pending', 'reached'] }
-        });
-        const conflict = activeReservations.find(r => hasOverlap(r.time, time, prefix));
+        const tblConflicts = activeReservationsForDate.filter(r => r.table === tbl.id);
+        const conflict = tblConflicts.find(r => hasOverlap(r.time, time, prefix));
         
         if (!conflict) {
           // If booking date is today, check if table is currently available live
@@ -394,12 +395,8 @@ app.post('/api/reservations', async (req, res) => {
         const blockedTables = [];
         for (const tbl of candidateTables) {
           if (tbl.status === 'blocked-walkin') {
-            const activeReservations = await ReservationModel.find({
-              table: tbl.id,
-              date: date,
-              status: { $in: ['approved', 'pending', 'reached'] }
-            });
-            const conflict = activeReservations.find(r => hasOverlap(r.time, time, prefix));
+            const tblConflicts = activeReservationsForDate.filter(r => r.table === tbl.id);
+            const conflict = tblConflicts.find(r => hasOverlap(r.time, time, prefix));
             if (!conflict) {
               blockedTables.push(tbl);
             }
@@ -595,6 +592,12 @@ app.patch('/api/reservations', async (req, res) => {
             else if (originalPrefix === 'D') upgradePrefixes = ['D'];
 
             let upgradedTable = null;
+            // Fetch all active reservations for this date in a single query to optimize performance
+            const activeReservationsForDate = await ReservationModel.find({
+              date: resVal.date,
+              status: { $in: ['approved', 'pending', 'reached'] }
+            });
+
             for (const prefix of upgradePrefixes) {
               // Find available tables in this prefix
               const candidates = await TableModel.find({
@@ -603,13 +606,9 @@ app.patch('/api/reservations', async (req, res) => {
               });
               
               for (const cand of candidates) {
-                // Check if candidate table has any active reservations overlapping with the checking-in guest's time
-                const activeReservations = await ReservationModel.find({
-                  table: cand.id,
-                  date: resVal.date,
-                  status: { $in: ['approved', 'pending', 'reached'] }
-                });
-                const conflict = activeReservations.find(r => hasOverlap(r.time, resVal.time, prefix));
+                // Filter reservations in-memory
+                const tblConflicts = activeReservationsForDate.filter(r => r.table === cand.id);
+                const conflict = tblConflicts.find(r => hasOverlap(r.time, resVal.time, prefix));
                 if (!conflict) {
                   upgradedTable = cand;
                   break;
