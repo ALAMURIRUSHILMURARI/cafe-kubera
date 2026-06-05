@@ -881,10 +881,12 @@ async function checkReservationTimeouts() {
           // Send rescheduling mail
           await sendMailSafe(res.email, "Reservation Hold Expired", getRescheduleHTML(res));
         }
-        // 2. 90-minute Activation check
+        // 2. Activation check (90 mins for A/B, 120 mins for C/D)
         else {
           const diffMs = resTime - now;
-          if (diffMs <= 90 * 60 * 1000 && diffMs >= -20 * 60 * 1000) {
+          const prefix = res.table[0];
+          const activationWindow = (prefix === 'C' || prefix === 'D') ? 120 * 60 * 1000 : 90 * 60 * 1000;
+          if (diffMs <= activationWindow && diffMs >= -20 * 60 * 1000) {
             const tbl = await TableModel.findOne({ id: res.table });
             if (tbl && (tbl.status === 'available' || tbl.status === 'blocked-walkin')) {
               tbl.status = 'reserved';
@@ -960,10 +962,12 @@ async function checkReservationTimeouts() {
             
             await sendMailSafe(res.email, "Reservation Hold Expired", getRescheduleHTML(res));
           }
-          // 2. 90-minute Activation check
+          // 2. Activation check (90 mins for A/B, 120 mins for C/D)
           else {
             const diffMs = resTime - now;
-            if (diffMs <= 90 * 60 * 1000 && diffMs >= -20 * 60 * 1000) {
+            const prefix = res.table[0];
+            const activationWindow = (prefix === 'C' || prefix === 'D') ? 120 * 60 * 1000 : 90 * 60 * 1000;
+            if (diffMs <= activationWindow && diffMs >= -20 * 60 * 1000) {
               const tbl = data.tables.find(t => t.id === res.table);
               if (tbl && (tbl.status === 'available' || tbl.status === 'blocked-walkin')) {
                 tbl.status = 'reserved';
