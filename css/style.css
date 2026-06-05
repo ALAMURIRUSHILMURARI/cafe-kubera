@@ -317,6 +317,7 @@ nav ul {
   display: flex;
   list-style: none;
   gap: 32px;
+  align-items: center;
 }
 
 .nav-link {
@@ -328,6 +329,28 @@ nav ul {
   position: relative;
   padding: 8px 0;
   white-space: nowrap;
+}
+
+.nav-link.highlighted {
+  color: #050505;
+  background: linear-gradient(135deg, #F3CD4F 0%, #D4AF37 50%, #B89225 100%);
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+  transition: var(--transition-smooth);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.highlighted:hover {
+  background: linear-gradient(135deg, #FFF099 0%, #F3CD4F 50%, #D4AF37 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(212, 175, 55, 0.45);
+  color: #050505;
+}
+
+.nav-link.highlighted::after {
+  display: none !important;
 }
 
 
