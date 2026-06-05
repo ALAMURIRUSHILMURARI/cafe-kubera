@@ -35,7 +35,8 @@ const ReservationSchema = new mongoose.Schema({
   date: String,
   time: String,
   status: { type: String, enum: ['pending', 'approved', 'reached', 'no-show', 'left', 'cancelled'], default: 'pending' },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  arrivedAt: Date
 }, { collection: 'kubera-reservations' });
 
 const TableModel = mongoose.model('Table', TableSchema);
@@ -575,6 +576,9 @@ app.patch('/api/reservations', async (req, res) => {
       if (!resVal) return res.status(404).json({ success: false, error: "Reservation not found." });
       
       resVal.status = status;
+      if (status === 'reached') {
+        resVal.arrivedAt = new Date().toISOString();
+      }
       
       // Update Table Status
       const tbl = await TableModel.findOne({ id: resVal.table });
@@ -666,6 +670,9 @@ app.patch('/api/reservations', async (req, res) => {
     if (!resVal) return res.status(404).json({ success: false, error: "Reservation not found." });
     
     resVal.status = status;
+    if (status === 'reached') {
+      resVal.arrivedAt = new Date().toISOString();
+    }
     
     const tbl = data.tables.find(t => t.id === resVal.table);
     if (tbl) {

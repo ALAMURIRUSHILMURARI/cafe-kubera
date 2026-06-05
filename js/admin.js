@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeRes) {
           details.innerHTML = `
             <p class="table-details-name">${activeRes.name}</p>
-            <p>Seated since ${formatTime(activeRes.createdAt)}</p>
+            <p>Seated since ${formatTime(activeRes.arrivedAt || activeRes.createdAt)}</p>
           `;
         } else {
           details.innerHTML = '<p>Occupied. Guest details unavailable.</p>';
