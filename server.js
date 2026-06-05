@@ -846,10 +846,6 @@ async function checkReservationTimeouts() {
       
       for (const tbl of blockedTables) {
         let shouldRelease = false;
-        if (tbl.blockedAt) {
-          const elapsedMins = (now - new Date(tbl.blockedAt)) / (1000 * 60);
-          if (elapsedMins >= 90) shouldRelease = true;
-        }
         if (istHour >= 23 || istHour < 9) shouldRelease = true;
         
         if (shouldRelease) {
@@ -929,10 +925,6 @@ async function checkReservationTimeouts() {
       for (const tbl of data.tables) {
         if (tbl.status === 'blocked-walkin') {
           let shouldRelease = false;
-          if (tbl.blockedAt) {
-            const elapsedMins = (now - new Date(tbl.blockedAt)) / (1000 * 60);
-            if (elapsedMins >= 90) shouldRelease = true;
-          }
           if (istHour >= 23 || istHour < 9) shouldRelease = true;
           
           if (shouldRelease) {
