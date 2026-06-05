@@ -557,8 +557,9 @@ app.patch('/api/reservations', async (req, res) => {
       const tbl = await TableModel.findOne({ id: resVal.table });
       if (tbl) {
         if (status === 'reached') {
-          // If the assigned table is still blocked for walk-ins, upgrade to the next capacity segment
-          if (tbl.status === 'blocked-walkin') {
+          // Upgrade if table is blocked for walk-in OR occupied by a different guest (overstay collision)
+          const isOccupiedByOther = tbl.status === 'occupied' && tbl.currentReservationId && tbl.currentReservationId !== resVal._id.toString();
+          if (tbl.status === 'blocked-walkin' || isOccupiedByOther) {
             const originalPrefix = resVal.table[0];
             let upgradePrefixes = [];
             if (originalPrefix === 'A') upgradePrefixes = ['B', 'C', 'D'];
@@ -567,19 +568,31 @@ app.patch('/api/reservations', async (req, res) => {
 
             let upgradedTable = null;
             for (const prefix of upgradePrefixes) {
-              const availableInPrefix = await TableModel.findOne({
+              // Find available tables in this prefix
+              const candidates = await TableModel.find({
                 id: new RegExp('^' + prefix),
                 status: 'available'
               });
-              if (availableInPrefix) {
-                upgradedTable = availableInPrefix;
-                break;
+              
+              for (const cand of candidates) {
+                // Check if candidate table has any active reservations overlapping with the checking-in guest's time
+                const activeReservations = await ReservationModel.find({
+                  table: cand.id,
+                  date: resVal.date,
+                  status: { $in: ['approved', 'pending', 'reached'] }
+                });
+                const conflict = activeReservations.find(r => hasOverlap(r.time, resVal.time, prefix));
+                if (!conflict) {
+                  upgradedTable = cand;
+                  break;
+                }
               }
+              if (upgradedTable) break;
             }
 
             if (upgradedTable) {
               console.log(`Upgrading reservation ${id} from Table ${resVal.table} to Table ${upgradedTable.id} on arrival`);
-              // Clear currentReservationId on the original table (but keep it as blocked-walkin)
+              // Clear currentReservationId on the original table (if it was occupied or blocked, keep its status)
               tbl.currentReservationId = null;
               await tbl.save();
 
@@ -593,6 +606,7 @@ app.patch('/api/reservations', async (req, res) => {
             } else {
               // No upgraded table available, fallback to original table
               tbl.status = 'occupied';
+              tbl.currentReservationId = resVal._id.toString();
               await tbl.save();
             }
           } else {
@@ -632,8 +646,9 @@ app.patch('/api/reservations', async (req, res) => {
     const tbl = data.tables.find(t => t.id === resVal.table);
     if (tbl) {
       if (status === 'reached') {
-        // If the assigned table is still blocked for walk-ins, upgrade to the next capacity segment
-        if (tbl.status === 'blocked-walkin') {
+        // Upgrade if table is blocked for walk-in OR occupied by a different guest (overstay collision)
+        const isOccupiedByOther = tbl.status === 'occupied' && tbl.currentReservationId && tbl.currentReservationId !== resVal.id;
+        if (tbl.status === 'blocked-walkin' || isOccupiedByOther) {
           const originalPrefix = resVal.table[0];
           let upgradePrefixes = [];
           if (originalPrefix === 'A') upgradePrefixes = ['B', 'C', 'D'];
@@ -642,16 +657,25 @@ app.patch('/api/reservations', async (req, res) => {
 
           let upgradedTable = null;
           for (const prefix of upgradePrefixes) {
-            const availableInPrefix = data.tables.find(t => t.id.startsWith(prefix) && t.status === 'available');
-            if (availableInPrefix) {
-              upgradedTable = availableInPrefix;
-              break;
+            const candidates = data.tables.filter(t => t.id.startsWith(prefix) && t.status === 'available');
+            for (const cand of candidates) {
+              const conflict = data.reservations.find(r => 
+                r.table === cand.id &&
+                r.date === resVal.date &&
+                ['approved', 'pending', 'reached'].includes(r.status) &&
+                hasOverlap(r.time, resVal.time, prefix)
+              );
+              if (!conflict) {
+                upgradedTable = cand;
+                break;
+              }
             }
+            if (upgradedTable) break;
           }
 
           if (upgradedTable) {
             console.log(`Local Upgrade reservation ${id} from Table ${resVal.table} to Table ${upgradedTable.id} on arrival`);
-            // Clear currentReservationId on the original table (but keep it as blocked-walkin)
+            // Clear currentReservationId on the original table (if it was occupied or blocked, keep its status)
             tbl.currentReservationId = null;
 
             // Update reservation to point to the new upgraded table
@@ -663,6 +687,7 @@ app.patch('/api/reservations', async (req, res) => {
           } else {
             // Fallback
             tbl.status = 'occupied';
+            tbl.currentReservationId = resVal.id;
           }
         } else {
           // Normal check-in
