@@ -330,9 +330,6 @@ nav ul {
   white-space: nowrap;
 }
 
-.header-cta {
-  white-space: nowrap;
-}
 
 .nav-link::after {
   content: '';
@@ -1617,21 +1614,12 @@ footer {
    RESPONSIVENESS AND MOBILE ADAPTATION
    ========================================================================== */
 
-@media (max-width: 1200px) {
-  nav ul {
-    gap: 20px;
-  }
-}
-
 @media (max-width: 1024px) {
   nav ul {
-    gap: 12px;
+    gap: 24px;
   }
   .header-container {
     padding: 0 16px;
-  }
-  .header-cta {
-    padding: 12px 20px;
   }
   .hero-title {
     font-size: 44px;
@@ -1650,15 +1638,7 @@ footer {
 
 @media (max-width: 900px) {
   nav ul {
-    gap: 8px;
-  }
-  .logo {
-    font-size: 19px;
-    letter-spacing: 2px;
-  }
-  .logo .sub-logo {
-    font-size: 13px;
-    letter-spacing: 3px;
+    gap: 16px;
   }
 }
 
@@ -1672,10 +1652,6 @@ footer {
   }
   nav {
     display: none; /* In a real app we'd add a toggle, but for single-page clean presentation we can let CTAs guide */
-  }
-  .header-cta {
-    padding: 10px 20px;
-    font-size: 12px;
   }
 
   .hero-section {
