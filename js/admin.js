@@ -1,6 +1,71 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================
+  // 0. ADMIN LOGIN & AUTHENTICATION FLOW
+  // ==========================================
+  const loginModal = document.getElementById('admin-login-modal');
+  const loginForm = document.getElementById('admin-login-form');
+  const loginUsername = document.getElementById('login-username');
+  const loginPassword = document.getElementById('login-password');
+  const loginError = document.getElementById('login-error');
+
+  function showLoginModal() {
+    loginModal.classList.add('active');
+  }
+
+  function hideLoginModal() {
+    loginModal.classList.remove('active');
+  }
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.style.display = 'none';
+    
+    const username = loginUsername.value;
+    const password = loginPassword.value;
+    
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        sessionStorage.setItem('adminToken', result.token);
+        hideLoginModal();
+        refreshDashboard();
+      } else {
+        loginError.style.display = 'block';
+      }
+    } catch (err) {
+      console.error(err);
+      loginError.style.display = 'block';
+    }
+  });
+
+  async function adminFetch(url, options = {}) {
+    const token = sessionStorage.getItem('adminToken');
+    if (!token) {
+      showLoginModal();
+      throw new Error("No admin token found");
+    }
+    
+    if (!options.headers) {
+      options.headers = {};
+    }
+    options.headers['Authorization'] = `Basic ${token}`;
+    
+    const response = await fetch(url, options);
+    if (response.status === 401) {
+      sessionStorage.removeItem('adminToken');
+      showLoginModal();
+      throw new Error("Unauthorized");
+    }
+    return response;
+  }
+
+  // ==========================================
   // 1. PROMISE-DRIVEN CUSTOM MODAL
   // ==========================================
   const modalOverlay = document.getElementById('custom-confirm-modal');
@@ -62,10 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Polling loop
   async function refreshDashboard() {
     try {
-      const tablesRes = await fetch('/api/tables');
+      const tablesRes = await adminFetch('/api/tables');
       tablesData = await tablesRes.json();
       
-      const resRes = await fetch('/api/reservations');
+      const resRes = await adminFetch('/api/reservations');
       reservationsData = await resRes.json();
       
       clearAllTimers();
@@ -238,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!confirm) return;
     
     try {
-      const response = await fetch('/api/tables/block', {
+      const response = await adminFetch('/api/tables/block', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ table: tableId })
@@ -263,14 +328,14 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       // If table has a reservation, mark the reservation as 'left' (unless it is just a walk-in block with a linked upcoming reservation)
       if (table && table.currentReservationId && table.status !== 'blocked-walkin') {
-        await fetch('/api/reservations', {
+        await adminFetch('/api/reservations', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: table.currentReservationId, status: 'left' })
         });
       } else {
         // Just call table release (for walkins)
-        await fetch('/api/tables/release', {
+        await adminFetch('/api/tables/release', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ table: tableId })
@@ -284,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function markCustomerReached(resId) {
     try {
-      const response = await fetch('/api/reservations', {
+      const response = await adminFetch('/api/reservations', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: resId, status: 'reached' })
@@ -304,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!confirm) return;
     
     try {
-      const response = await fetch('/api/reservations', {
+      const response = await adminFetch('/api/reservations', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: resId, status: 'cancelled' })
@@ -368,8 +433,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  // Start polling
-  refreshDashboard();
-  setInterval(refreshDashboard, 5000); // Poll every 5s
+  // Start polling if authenticated
+  if (sessionStorage.getItem('adminToken')) {
+    refreshDashboard();
+  } else {
+    showLoginModal();
+  }
+  
+  setInterval(() => {
+    if (sessionStorage.getItem('adminToken')) {
+      refreshDashboard();
+    }
+  }, 5000); // Poll every 5s
 
 });

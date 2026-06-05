@@ -541,6 +541,27 @@
     </div>
   </div>
 
+  <!-- Gorgeous Admin Login Overlay -->
+  <div class="custom-modal-overlay" id="admin-login-modal">
+    <div class="custom-modal-window" style="max-width: 400px;">
+      <span class="modal-icon">🔒</span>
+      <h3 class="modal-title">Admin Authentication</h3>
+      <p class="modal-message" style="margin-bottom: 24px;">Enter credentials to access the control panel.</p>
+      <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 16px; text-align: left;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="login-username" style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-cream); margin-bottom: 6px; font-weight: 600;">Username</label>
+          <input type="text" id="login-username" required placeholder="Enter username" style="width: 100%; background: rgba(250, 246, 240, 0.02); border: 1px solid rgba(250, 246, 240, 0.1); color: var(--text-cream); padding: 12px; border-radius: 6px; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition-smooth);">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="login-password" style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-cream); margin-bottom: 6px; font-weight: 600;">Password</label>
+          <input type="password" id="login-password" required placeholder="Enter password" style="width: 100%; background: rgba(250, 246, 240, 0.02); border: 1px solid rgba(250, 246, 240, 0.1); color: var(--text-cream); padding: 12px; border-radius: 6px; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition-smooth);">
+        </div>
+        <div id="login-error" style="color: #E74C3C; font-size: 12px; text-align: center; display: none; font-weight: 600; margin-top: 4px;">Invalid credentials. Please try again.</div>
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px; font-size: 13px; padding: 12px; border-radius: 6px;">Access Dashboard</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Main scripts -->
   <script src="js/admin.js"></script>
 </body>

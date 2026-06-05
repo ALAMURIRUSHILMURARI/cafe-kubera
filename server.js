@@ -247,7 +247,40 @@ function getRescheduleHTML(res) {
 // 3. REST API ENDPOINTS
 // ==========================================
 
-app.get('/api/test-db', async (req, res) => {
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'kuberaluxury';
+
+function requireAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Basic ')) {
+    return res.status(401).json({ success: false, error: 'Unauthorized. Admin credentials required.' });
+  }
+  
+  const token = authHeader.substring(6);
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const [username, password] = decoded.split(':');
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      return next();
+    }
+  } catch (err) {
+    // Ignore error
+  }
+  
+  return res.status(401).json({ success: false, error: 'Unauthorized. Invalid credentials.' });
+}
+
+// POST /api/admin/login
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    const token = Buffer.from(`${username}:${password}`).toString('base64');
+    return res.json({ success: true, token });
+  }
+  return res.status(401).json({ success: false, error: 'Invalid username or password.' });
+});
+
+app.get('/api/test-db', requireAdmin, async (req, res) => {
   try {
     if (!process.env.MONGODB_URI) {
       return res.json({ error: "No MONGODB_URI" });
@@ -267,7 +300,7 @@ app.get('/api/test-db', async (req, res) => {
 });
 
 // GET /api/tables
-app.get('/api/tables', async (req, res) => {
+app.get('/api/tables', requireAdmin, async (req, res) => {
   try {
     await checkReservationTimeouts();
   } catch (err) {
@@ -288,7 +321,7 @@ app.get('/api/tables', async (req, res) => {
 });
 
 // GET /api/reservations
-app.get('/api/reservations', async (req, res) => {
+app.get('/api/reservations', requireAdmin, async (req, res) => {
   try {
     await checkReservationTimeouts();
   } catch (err) {
@@ -561,7 +594,7 @@ app.post('/api/reservations', async (req, res) => {
 });
 
 // PATCH /api/reservations (Update reservation state)
-app.patch('/api/reservations', async (req, res) => {
+app.patch('/api/reservations', requireAdmin, async (req, res) => {
   const { id, status } = req.body;
   if (!id || !status) {
     return res.status(400).json({ success: false, error: "Missing ID or Status." });
@@ -745,7 +778,7 @@ app.patch('/api/reservations', async (req, res) => {
 });
 
 // POST /api/tables/block (Block table walk-in)
-app.post('/api/tables/block', async (req, res) => {
+app.post('/api/tables/block', requireAdmin, async (req, res) => {
   const { table } = req.body;
   if (!table) return res.status(400).json({ success: false, error: "Missing Table ID." });
 
@@ -774,7 +807,7 @@ app.post('/api/tables/block', async (req, res) => {
 });
 
 // POST /api/tables/release (Release table)
-app.post('/api/tables/release', async (req, res) => {
+app.post('/api/tables/release', requireAdmin, async (req, res) => {
   const { table } = req.body;
   if (!table) return res.status(400).json({ success: false, error: "Missing Table ID." });
 
