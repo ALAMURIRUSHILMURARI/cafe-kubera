@@ -352,6 +352,17 @@ app.post('/api/reservations', async (req, res) => {
 
   if (process.env.MONGODB_URI) {
     try {
+      // Prevent duplicate bookings with the same details on the same date/time
+      const duplicate = await ReservationModel.findOne({
+        $or: [{ email: email }, { phone: phone }],
+        date: date,
+        time: time,
+        status: { $in: ['approved', 'pending', 'reached'] }
+      });
+      if (duplicate) {
+        return res.status(400).json({ success: false, error: "A reservation with this email or phone number already exists for this date and time." });
+      }
+
       // Find candidate tables matching capacity prefix
       const candidateTables = await TableModel.find({ id: new RegExp('^' + prefix) });
       
@@ -363,7 +374,7 @@ app.post('/api/reservations', async (req, res) => {
           date: date,
           status: { $in: ['approved', 'pending', 'reached'] }
         });
-        const conflict = activeReservations.find(r => hasOverlap(r.time, time));
+        const conflict = activeReservations.find(r => hasOverlap(r.time, time, prefix));
         
         if (!conflict) {
           // If booking date is today, check if table is currently available live
@@ -387,7 +398,7 @@ app.post('/api/reservations', async (req, res) => {
               date: date,
               status: { $in: ['approved', 'pending', 'reached'] }
             });
-            const conflict = activeReservations.find(r => hasOverlap(r.time, time));
+            const conflict = activeReservations.find(r => hasOverlap(r.time, time, prefix));
             if (!conflict) {
               blockedTables.push(tbl);
             }
@@ -443,6 +454,18 @@ app.post('/api/reservations', async (req, res) => {
     // Local JSON DB
     try {
       const data = getLocalData();
+
+      // Prevent duplicate bookings with the same details on the same date/time
+      const duplicate = data.reservations.find(r => 
+        (r.email === email || r.phone === phone) &&
+        r.date === date &&
+        r.time === time &&
+        ['approved', 'pending', 'reached'].includes(r.status)
+      );
+      if (duplicate) {
+        return res.status(400).json({ success: false, error: "A reservation with this email or phone number already exists for this date and time." });
+      }
+
       const candidateTables = data.tables.filter(t => t.id.startsWith(prefix));
       
       let assignedTable = null;
@@ -452,7 +475,7 @@ app.post('/api/reservations', async (req, res) => {
           r.table === tbl.id &&
           r.date === date &&
           ['approved', 'pending', 'reached'].includes(r.status) &&
-          hasOverlap(r.time, time)
+          hasOverlap(r.time, time, prefix)
         );
         
         if (!conflict) {
@@ -476,7 +499,7 @@ app.post('/api/reservations', async (req, res) => {
               r.table === tbl.id &&
               r.date === date &&
               ['approved', 'pending', 'reached'].includes(r.status) &&
-              hasOverlap(r.time, time)
+              hasOverlap(r.time, time, prefix)
             );
             if (!conflict) {
               blockedTables.push(tbl);
