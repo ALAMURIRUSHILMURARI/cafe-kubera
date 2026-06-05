@@ -411,8 +411,8 @@ app.post('/api/reservations', async (req, res) => {
         }
       }
       
-      // Dispatch Notices in parallel to minimize response lag
-      await Promise.all([
+      // Dispatch Notices in parallel in the background to completely eliminate response lag for the user
+      Promise.all([
         sendMailSafe(process.env.ADMIN_EMAIL || 'admin@cafekubera.com', "New Booking Alert", getAdminNoticeHTML(newRes)),
         sendMailSafe(newRes.email, "Reservation Approved", getArrivalHTML(newRes))
       ]).catch(err => console.error("Error sending booking notification emails:", err));
@@ -508,8 +508,8 @@ app.post('/api/reservations', async (req, res) => {
       data.reservations.push(newRes);
       saveLocalData(data);
       
-      // Dispatch Notices in parallel to minimize response lag
-      await Promise.all([
+      // Dispatch Notices in parallel in the background to completely eliminate response lag for the user
+      Promise.all([
         sendMailSafe(process.env.ADMIN_EMAIL || 'admin@cafekubera.com', "New Booking Alert", getAdminNoticeHTML(newRes)),
         sendMailSafe(newRes.email, "Reservation Approved", getArrivalHTML(newRes))
       ]).catch(err => console.error("Error sending booking notification emails:", err));
