@@ -310,13 +310,26 @@ app.get('/api/tables', requireAdmin, async (req, res) => {
   if (process.env.MONGODB_URI) {
     try {
       const tables = await TableModel.find().lean();
+      tables.sort((a, b) => {
+        const prefixA = a.id[0];
+        const prefixB = b.id[0];
+        if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+        return parseInt(a.id.slice(1), 10) - parseInt(b.id.slice(1), 10);
+      });
       return res.json(tables);
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
   } else {
     const data = getLocalData();
-    return res.json(data.tables);
+    const tables = [...data.tables];
+    tables.sort((a, b) => {
+      const prefixA = a.id[0];
+      const prefixB = b.id[0];
+      if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+      return parseInt(a.id.slice(1), 10) - parseInt(b.id.slice(1), 10);
+    });
+    return res.json(tables);
   }
 });
 
